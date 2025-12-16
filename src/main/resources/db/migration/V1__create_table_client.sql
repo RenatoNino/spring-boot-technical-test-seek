@@ -1,0 +1,7 @@
+CREATE TABLE client (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    surname VARCHAR(100) NOT NULL,
+    age INT NOT NULL,
+    birth_date DATE NOT NULL
+);
