@@ -2,6 +2,7 @@ package com.renato.pruebatecnica.seek.prueba_tecnica_seek.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -11,13 +12,16 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    // For demo only. In production, load from secure config or keystore.
-    private final Key key = Keys.hmacShaKeyFor("replace-this-with-a-very-long-secret-key-32-bytes-minimum".getBytes());
-    private final long validityInSeconds = 3600; // 1 hour
+    @Value("${jwt.secret}")
+    private String jwtSecret;
+
+    @Value("${jwt.expiration:3600}")
+    private long validityInSeconds;
 
     public String generateToken(String username) {
         Instant now = Instant.now();
         Instant expiry = now.plusSeconds(validityInSeconds);
+        Key key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
 
         return Jwts.builder()
                 .setSubject(username)
@@ -41,6 +45,7 @@ public class JwtTokenProvider {
     }
 
     private Jws<Claims> parseClaims(String token) {
+        Key key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
     }
 }
