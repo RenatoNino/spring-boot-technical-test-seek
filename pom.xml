@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.0.0</version>
+		<version>3.2.0</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.renato.pruebatecnica.seek</groupId>
@@ -29,7 +29,6 @@
 	</scm>
 	<properties>
 		<java.version>17</java.version>
-		<spring-boot.version>3.2.0</spring-boot.version>
 	</properties>
 	<dependencies>
 		<!-- Spring Boot Starters -->
@@ -60,6 +59,10 @@
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-core</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-mysql</artifactId>
+		</dependency>
 		<!-- MySQL Driver -->
 		<dependency>
 			<groupId>com.mysql</groupId>
@@ -89,6 +92,11 @@
 					<artifactId>junit-vintage-engine</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-test</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>

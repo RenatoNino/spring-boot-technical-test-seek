@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusiness(BusinessException ex, HttpServletRequest request) {
-        return buildResponse(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage(), request, null);
+        return buildResponse(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage(), request, null);
     }
 
     @ExceptionHandler(UnauthorizedException.class)
