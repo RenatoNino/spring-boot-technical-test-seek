@@ -3,12 +3,12 @@ package com.renato.pruebatecnica.seek.prueba_tecnica_seek.services;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.renato.pruebatecnica.seek.prueba_tecnica_seek.adapters.ClientResponseAdapter;
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.dtos.ClientCreateRequest;
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.dtos.ClientListResponse;
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.entities.Client;
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.repositories.ClientRepository;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,9 +16,11 @@ import java.util.stream.Collectors;
 public class ClientService {
 
     private final ClientRepository clientRepository;
+    private final ClientResponseAdapter clientResponseAdapter;
 
-    public ClientService(ClientRepository clientRepository) {
+    public ClientService(ClientRepository clientRepository, ClientResponseAdapter clientResponseAdapter) {
         this.clientRepository = clientRepository;
+        this.clientResponseAdapter = clientResponseAdapter;
     }
 
     @Transactional
@@ -30,7 +32,7 @@ public class ClientService {
                 .birthDate(request.getBirthDate())
                 .build();
         Client savedClient = clientRepository.save(client);
-        return mapToResponse(savedClient);
+        return clientResponseAdapter.toClientListResponse(savedClient);
     }
 
     public double calculateAverageAge() {
@@ -52,13 +54,8 @@ public class ClientService {
 
     public List<ClientListResponse> listClients() {
         return clientRepository.findAll().stream()
-                .map(this::mapToResponse)
+                .map(clientResponseAdapter::toClientListResponse)
                 .collect(Collectors.toList());
     }
 
-    private ClientListResponse mapToResponse(Client client) {
-        LocalDate estimatedDeathDate = client.getBirthDate().plusYears(80);
-        return new ClientListResponse(client.getId(), client.getName(), client.getSurname(), client.getAge(),
-                estimatedDeathDate);
-    }
 }
