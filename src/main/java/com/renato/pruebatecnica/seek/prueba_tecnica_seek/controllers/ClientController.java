@@ -6,10 +6,10 @@ import org.springframework.web.bind.annotation.*;
 
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.dtos.ClientCreateRequest;
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.dtos.ClientListResponse;
+import com.renato.pruebatecnica.seek.prueba_tecnica_seek.dtos.MetricsResponse;
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.services.ClientService;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/clients")
@@ -28,10 +28,10 @@ public class ClientController {
     }
 
     @GetMapping("/metrics")
-    public ResponseEntity<Object> getMetrics() {
+    public ResponseEntity<MetricsResponse> getMetrics() {
         double averageAge = clientService.calculateAverageAge();
         double standardDeviation = clientService.calculateStandardDeviation();
-        return ResponseEntity.ok(Map.of("averageAge", averageAge, "standardDeviation", standardDeviation));
+        return ResponseEntity.ok(new MetricsResponse(averageAge, standardDeviation));
     }
 
     @GetMapping

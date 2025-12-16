@@ -1,16 +1,11 @@
 package com.renato.pruebatecnica.seek.prueba_tecnica_seek.controllers;
 
-import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.renato.pruebatecnica.seek.prueba_tecnica_seek.dtos.LoginRequest;
+import com.renato.pruebatecnica.seek.prueba_tecnica_seek.dtos.TokenResponse;
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.security.JwtTokenProvider;
-
-record LoginRequest(@NotBlank String username, @NotBlank String password) {
-}
-
-record TokenResponse(String token) {
-}
 
 @RestController
 @RequestMapping("/auth")
