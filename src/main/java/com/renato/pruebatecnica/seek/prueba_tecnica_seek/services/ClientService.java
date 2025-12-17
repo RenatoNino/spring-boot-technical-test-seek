@@ -10,6 +10,7 @@ import com.renato.pruebatecnica.seek.prueba_tecnica_seek.dtos.ClientUpdateReques
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.entities.Client;
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.repositories.ClientRepository;
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.exceptions.BusinessException;
+import com.renato.pruebatecnica.seek.prueba_tecnica_seek.validations.ClientValidation;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,14 +20,18 @@ public class ClientService {
 
     private final ClientRepository clientRepository;
     private final ClientResponseAdapter clientResponseAdapter;
+    private final ClientValidation clientValidation;
 
-    public ClientService(ClientRepository clientRepository, ClientResponseAdapter clientResponseAdapter) {
+    public ClientService(ClientRepository clientRepository, ClientResponseAdapter clientResponseAdapter,
+            ClientValidation clientValidation) {
         this.clientRepository = clientRepository;
         this.clientResponseAdapter = clientResponseAdapter;
+        this.clientValidation = clientValidation;
     }
 
     @Transactional
     public ClientListResponse saveClient(ClientCreateRequest request) {
+        clientValidation.validateCreateClientBody(request);
         Client client = Client.builder()
                 .name(request.getName())
                 .surname(request.getSurname())
@@ -41,6 +46,7 @@ public class ClientService {
     public ClientListResponse updateClient(Long id, ClientUpdateRequest request) {
         Client client = clientRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("Client not found"));
+        clientValidation.validateUpdateClientBody(client, request);
         if (request.getName() != null) {
             client.setName(request.getName());
         }
