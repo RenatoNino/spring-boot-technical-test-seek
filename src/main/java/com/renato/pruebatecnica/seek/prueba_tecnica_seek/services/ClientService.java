@@ -12,6 +12,9 @@ import com.renato.pruebatecnica.seek.prueba_tecnica_seek.repositories.ClientRepo
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.exceptions.BusinessException;
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.validations.ClientValidation;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,12 +24,15 @@ public class ClientService {
     private final ClientRepository clientRepository;
     private final ClientResponseAdapter clientResponseAdapter;
     private final ClientValidation clientValidation;
+    private final Counter clientCreationCounter;
 
     public ClientService(ClientRepository clientRepository, ClientResponseAdapter clientResponseAdapter,
-            ClientValidation clientValidation) {
+            ClientValidation clientValidation, MeterRegistry meterRegistry) {
         this.clientRepository = clientRepository;
         this.clientResponseAdapter = clientResponseAdapter;
         this.clientValidation = clientValidation;
+        this.clientCreationCounter = meterRegistry.counter("client.creations.total");
+        ;
     }
 
     @Transactional
@@ -39,6 +45,9 @@ public class ClientService {
                 .birthDate(request.getBirthDate())
                 .build();
         Client savedClient = clientRepository.save(client);
+
+        clientCreationCounter.increment();
+
         return clientResponseAdapter.toClientListResponse(savedClient);
     }
 
