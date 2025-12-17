@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
+import java.util.Collections;
 
 @Component
 public class JwtTokenProvider {
@@ -18,13 +20,14 @@ public class JwtTokenProvider {
     @Value("${jwt.expiration}")
     private long validityInSeconds;
 
-    public String generateToken(String username) {
+    public String generateToken(String username, List<String> roles) {
         Instant now = Instant.now();
         Instant expiry = now.plusSeconds(validityInSeconds);
         Key key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
 
         return Jwts.builder()
                 .setSubject(username)
+                .claim("roles", roles)
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(expiry))
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -33,6 +36,18 @@ public class JwtTokenProvider {
 
     public String getUsername(String token) {
         return parseClaims(token).getBody().getSubject();
+    }
+
+    public List<String> getRoles(String token) {
+        Claims claims = parseClaims(token).getBody();
+        Object roles = claims.get("roles");
+        if (roles instanceof List<?> list) {
+            return list.stream()
+                    .filter(String.class::isInstance)
+                    .map(String.class::cast)
+                    .toList();
+        }
+        return Collections.emptyList();
     }
 
     public boolean validateToken(String token) {
