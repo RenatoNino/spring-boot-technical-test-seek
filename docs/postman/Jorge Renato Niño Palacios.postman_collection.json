@@ -1,0 +1,250 @@
+{
+	"info": {
+		"_postman_id": "63e3f51c-7aec-441b-aee0-01c2940c2c1f",
+		"name": "Jorge Renato Niño Palacios",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34483536"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"user@email.com\",\r\n    \"password\": \"password\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{seek-api-prod}}/auth/login",
+							"host": [
+								"{{seek-api-prod}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Clients",
+			"item": [
+				{
+					"name": "List - HttpCode 200",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{seek-api-version-prod}}/clients",
+							"host": [
+								"{{seek-api-version-prod}}"
+							],
+							"path": [
+								"clients"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create - HttpCode 200",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Jorge Renato\",\r\n    \"surname\": \"Niño Palacios\",\r\n    \"age\": 24,\r\n    \"birthDate\": \"2001-04-24\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{seek-api-version-prod}}/clients",
+							"host": [
+								"{{seek-api-version-prod}}"
+							],
+							"path": [
+								"clients"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create - HttpCode 422",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Jorge Renato\",\r\n    \"surname\": \"Niño Palacios\",\r\n    \"age\": 30,\r\n    \"birthDate\": \"2001-04-24\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{seek-api-version-prod}}/clients",
+							"host": [
+								"{{seek-api-version-prod}}"
+							],
+							"path": [
+								"clients"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update - HttpCode 200",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"age\": 28,\r\n    \"birthDate\": \"1997-10-24\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{seek-api-version-prod}}/clients/1",
+							"host": [
+								"{{seek-api-version-prod}}"
+							],
+							"path": [
+								"clients",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update - HttpCode 500",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"age\": null,\r\n    \"birthDate\": \"InvalidDate\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{seek-api-version-prod}}/clients/1",
+							"host": [
+								"{{seek-api-version-prod}}"
+							],
+							"path": [
+								"clients",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Valeria Elizabeth\",\r\n    \"surname\": \"Niño Palacios\",\r\n    \"age\": 28,\r\n    \"birthDate\": \"1997-10-24\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{seek-api-version-prod}}/clients/3",
+							"host": [
+								"{{seek-api-version-prod}}"
+							],
+							"path": [
+								"clients",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Metrics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{seek-api-version-prod}}/clients/metrics/test",
+							"host": [
+								"{{seek-api-version-prod}}"
+							],
+							"path": [
+								"clients",
+								"metrics",
+								"test"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{seek-api-token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
