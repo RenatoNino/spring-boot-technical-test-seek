@@ -6,8 +6,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.adapters.ClientResponseAdapter;
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.dtos.ClientCreateRequest;
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.dtos.ClientListResponse;
+import com.renato.pruebatecnica.seek.prueba_tecnica_seek.dtos.ClientUpdateRequest;
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.entities.Client;
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.repositories.ClientRepository;
+import com.renato.pruebatecnica.seek.prueba_tecnica_seek.exceptions.BusinessException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,6 +35,31 @@ public class ClientService {
                 .build();
         Client savedClient = clientRepository.save(client);
         return clientResponseAdapter.toClientListResponse(savedClient);
+    }
+
+    @Transactional
+    public ClientListResponse updateClient(Long id, ClientUpdateRequest request) {
+        Client client = clientRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("Client not found"));
+        if (request.getName() != null) {
+            client.setName(request.getName());
+        }
+        if (request.getSurname() != null) {
+            client.setSurname(request.getSurname());
+        }
+        if (request.getAge() != null) {
+            client.setAge(request.getAge());
+        }
+        if (request.getBirthDate() != null) {
+            client.setBirthDate(request.getBirthDate());
+        }
+        Client updated = clientRepository.save(client);
+        return clientResponseAdapter.toClientListResponse(updated);
+    }
+
+    @Transactional
+    public void deleteClient(Long id) {
+        clientRepository.findById(id).ifPresent(clientRepository::delete);
     }
 
     public double calculateAverageAge() {

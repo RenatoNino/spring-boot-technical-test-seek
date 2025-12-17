@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.dtos.ClientCreateRequest;
+import com.renato.pruebatecnica.seek.prueba_tecnica_seek.dtos.ClientUpdateRequest;
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.dtos.ClientListResponse;
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.dtos.MetricsResponse;
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.services.ClientService;
@@ -27,6 +28,14 @@ public class ClientController {
         return ResponseEntity.status(201).body(response);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<ClientListResponse> updateClient(
+            @PathVariable Long id,
+            @RequestBody ClientUpdateRequest request) {
+        ClientListResponse response = clientService.updateClient(id, request);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/metrics")
     public ResponseEntity<MetricsResponse> getMetrics() {
         double averageAge = clientService.calculateAverageAge();
@@ -38,5 +47,11 @@ public class ClientController {
     public ResponseEntity<List<ClientListResponse>> listClients() {
         List<ClientListResponse> clients = clientService.listClients();
         return ResponseEntity.ok(clients);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteClient(@PathVariable Long id) {
+        clientService.deleteClient(id);
+        return ResponseEntity.noContent().build();
     }
 }
