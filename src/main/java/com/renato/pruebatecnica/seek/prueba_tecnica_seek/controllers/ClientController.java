@@ -4,11 +4,12 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.renato.pruebatecnica.seek.prueba_tecnica_seek.adapters.ClientResponseAdapter;
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.dtos.ClientCreateRequest;
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.dtos.ClientUpdateRequest;
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.dtos.ClientListResponse;
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.dtos.MetricsResponse;
-import com.renato.pruebatecnica.seek.prueba_tecnica_seek.services.ClientService;
+import com.renato.pruebatecnica.seek.prueba_tecnica_seek.services.ClientServiceImpl;
 
 import java.util.List;
 
@@ -16,15 +17,17 @@ import java.util.List;
 @RequestMapping("/api/v1/clients")
 public class ClientController {
 
-    private final ClientService clientService;
+    private final ClientServiceImpl clientService;
+    private final ClientResponseAdapter clientResponseAdapter;
 
-    public ClientController(ClientService clientService) {
+    public ClientController(ClientServiceImpl clientService, ClientResponseAdapter clientResponseAdapter) {
         this.clientService = clientService;
+        this.clientResponseAdapter = clientResponseAdapter;
     }
 
     @PostMapping
     public ResponseEntity<ClientListResponse> createClient(@Valid @RequestBody ClientCreateRequest request) {
-        ClientListResponse response = clientService.saveClient(request);
+        ClientListResponse response = clientResponseAdapter.toClientListResponse(clientService.saveClient(request));
         return ResponseEntity.status(201).body(response);
     }
 
@@ -32,8 +35,16 @@ public class ClientController {
     public ResponseEntity<ClientListResponse> updateClient(
             @PathVariable Long id,
             @RequestBody ClientUpdateRequest request) {
-        ClientListResponse response = clientService.updateClient(id, request);
+        ClientListResponse response = clientResponseAdapter
+                .toClientListResponse(clientService.updateClient(id, request));
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ClientListResponse>> listClients() {
+        List<ClientListResponse> clients = clientService.listClients().stream()
+                .map(clientResponseAdapter::toClientListResponse).toList();
+        return ResponseEntity.ok(clients);
     }
 
     @GetMapping("/metrics")
@@ -41,12 +52,6 @@ public class ClientController {
         double averageAge = clientService.calculateAverageAge();
         double standardDeviation = clientService.calculateStandardDeviation();
         return ResponseEntity.ok(new MetricsResponse(averageAge, standardDeviation));
-    }
-
-    @GetMapping
-    public ResponseEntity<List<ClientListResponse>> listClients() {
-        List<ClientListResponse> clients = clientService.listClients();
-        return ResponseEntity.ok(clients);
     }
 
     @DeleteMapping("/{id}")

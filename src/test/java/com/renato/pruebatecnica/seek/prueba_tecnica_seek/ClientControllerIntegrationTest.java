@@ -19,17 +19,17 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.controllers.ClientController;
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.dtos.ClientCreateRequest;
-import com.renato.pruebatecnica.seek.prueba_tecnica_seek.dtos.ClientListResponse;
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.dtos.ClientUpdateRequest;
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.dtos.MetricsResponse;
+import com.renato.pruebatecnica.seek.prueba_tecnica_seek.entities.Client;
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.exceptions.BusinessException;
 import com.renato.pruebatecnica.seek.prueba_tecnica_seek.services.ClientService;
 
@@ -38,114 +38,137 @@ import com.renato.pruebatecnica.seek.prueba_tecnica_seek.services.ClientService;
 @ActiveProfiles("test")
 class ClientControllerIntegrationTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+        @Autowired
+        private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+        @Autowired
+        private ObjectMapper objectMapper;
 
-    @MockBean
-    private ClientService clientService;
+        @MockitoBean
+        private ClientService clientService;
 
-    @Test
-    void createClient_withValidData_returnsCreatedClient() throws Exception {
-        ClientCreateRequest request = new ClientCreateRequest();
-        request.setName("John");
-        request.setSurname("Doe");
-        request.setAge(30);
-        request.setBirthDate(LocalDate.of(1994, 12, 17));
+        @Test
+        void createClient_withValidData_returnsCreatedClient() throws Exception {
+                ClientCreateRequest request = new ClientCreateRequest();
+                request.setName("John");
+                request.setSurname("Doe");
+                request.setAge(30);
+                request.setBirthDate(LocalDate.of(1994, 12, 17));
 
-        ClientListResponse created = new ClientListResponse(1L, "John", "Doe", 30, null);
-        given(clientService.saveClient(any(ClientCreateRequest.class))).willReturn(created);
+                Client created = new Client();
+                created.setId(1L);
+                created.setName("Jhon");
+                created.setSurname("Dow");
+                created.setAge(30);
+                created.setBirthDate(null);
+                given(clientService.saveClient(any(ClientCreateRequest.class))).willReturn(created);
 
-        mockMvc.perform(post("/api/v1/clients")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id", notNullValue()))
-                .andExpect(jsonPath("$.name").value("John"))
-                .andExpect(jsonPath("$.surname").value("Doe"))
-                .andExpect(jsonPath("$.age").value(30));
-    }
+                mockMvc.perform(post("/api/v1/clients")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                                .andExpect(status().isCreated())
+                                .andExpect(jsonPath("$.id", notNullValue()))
+                                .andExpect(jsonPath("$.name").value("John"))
+                                .andExpect(jsonPath("$.surname").value("Doe"))
+                                .andExpect(jsonPath("$.age").value(30));
+        }
 
-    @Test
-    void createClient_withBusinessError_returnsUnprocessableEntity() throws Exception {
-        ClientCreateRequest request = new ClientCreateRequest();
-        request.setName("Jane");
-        request.setSurname("Doe");
-        request.setAge(20);
-        request.setBirthDate(LocalDate.of(2000, 1, 1));
+        @Test
+        void createClient_withBusinessError_returnsUnprocessableEntity() throws Exception {
+                ClientCreateRequest request = new ClientCreateRequest();
+                request.setName("Jane");
+                request.setSurname("Doe");
+                request.setAge(20);
+                request.setBirthDate(LocalDate.of(2000, 1, 1));
 
-        willThrow(new BusinessException("Age does not match birth date"))
-                .given(clientService)
-                .saveClient(any(ClientCreateRequest.class));
+                willThrow(new BusinessException("Age does not match birth date"))
+                                .given(clientService)
+                                .saveClient(any(ClientCreateRequest.class));
 
-        mockMvc.perform(post("/api/v1/clients")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isUnprocessableEntity());
-    }
+                mockMvc.perform(post("/api/v1/clients")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                                .andExpect(status().isUnprocessableEntity());
+        }
 
-    @Test
-    void listClients_returnsClientList() throws Exception {
-        ClientListResponse c1 = new ClientListResponse(1L, "A", "B", 30, null);
-        ClientListResponse c2 = new ClientListResponse(2L, "C", "D", 25, null);
-        given(clientService.listClients()).willReturn(List.of(c1, c2));
+        @Test
+        void listClients_returnsClientList() throws Exception {
+                Client c1 = new Client();
+                c1.setId(1L);
+                c1.setName("A");
+                c1.setSurname("B");
+                c1.setAge(30);
+                c1.setBirthDate(null);
 
-        mockMvc.perform(get("/api/v1/clients"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1L))
-                .andExpect(jsonPath("$[0].name").value("A"))
-                .andExpect(jsonPath("$[1].id").value(2L))
-                .andExpect(jsonPath("$[1].surname").value("D"));
-    }
+                Client c2 = new Client();
+                c2.setId(2L);
+                c2.setName("C");
+                c2.setSurname("D");
+                c2.setAge(25);
+                c2.setBirthDate(null);
 
-    @Test
-    void updateClient_withValidData_returnsUpdatedClient() throws Exception {
-        ClientUpdateRequest updateRequest = new ClientUpdateRequest();
-        updateRequest.setName("Updated Name");
-        updateRequest.setSurname("Updated Surname");
+                given(clientService.listClients()).willReturn(List.of(c1, c2));
 
-        ClientListResponse updated = new ClientListResponse(1L, "Updated Name", "Updated Surname", 30, null);
-        given(clientService.updateClient(eq(1L), any(ClientUpdateRequest.class))).willReturn(updated);
+                mockMvc.perform(get("/api/v1/clients"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$[0].id").value(1L))
+                                .andExpect(jsonPath("$[0].name").value("A"))
+                                .andExpect(jsonPath("$[1].id").value(2L))
+                                .andExpect(jsonPath("$[1].surname").value("D"));
+        }
 
-        mockMvc.perform(put("/api/v1/clients/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updateRequest)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Updated Name"))
-                .andExpect(jsonPath("$.surname").value("Updated Surname"));
-    }
+        @Test
+        void updateClient_withValidData_returnsUpdatedClient() throws Exception {
+                ClientUpdateRequest updateRequest = new ClientUpdateRequest();
+                updateRequest.setName("Updated Name");
+                updateRequest.setSurname("Updated Surname");
 
-    @Test
-    void updateClient_withNonExistentId_returnsUnprocessableEntity() throws Exception {
-        ClientUpdateRequest updateRequest = new ClientUpdateRequest();
-        updateRequest.setName("Updated Name");
+                Client updated = new Client();
+                updated.setId(1L);
+                updated.setName("Updated Name");
+                updated.setSurname("Updated Surname");
+                updated.setAge(30);
+                updated.setBirthDate(null);
 
-        given(clientService.updateClient(eq(99999L), any(ClientUpdateRequest.class)))
-                .willThrow(new BusinessException("Client not found"));
+                given(clientService.updateClient(eq(1L), any(ClientUpdateRequest.class))).willReturn(updated);
 
-        mockMvc.perform(put("/api/v1/clients/99999")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updateRequest)))
-                .andExpect(status().isUnprocessableEntity());
-    }
+                mockMvc.perform(put("/api/v1/clients/1")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(updateRequest)))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.name").value("Updated Name"))
+                                .andExpect(jsonPath("$.surname").value("Updated Surname"));
+        }
 
-    @Test
-    void deleteClient_withAnyId_returnsNoContent() throws Exception {
-        mockMvc.perform(delete("/api/v1/clients/1"))
-                .andExpect(status().isNoContent());
-    }
+        @Test
+        void updateClient_withNonExistentId_returnsUnprocessableEntity() throws Exception {
+                ClientUpdateRequest updateRequest = new ClientUpdateRequest();
+                updateRequest.setName("Updated Name");
 
-    @Test
-    void getMetrics_returnsMetricsData() throws Exception {
-        MetricsResponse metrics = new MetricsResponse(10.0, 2.5);
-        given(clientService.calculateAverageAge()).willReturn(metrics.getAverageAge());
-        given(clientService.calculateStandardDeviation()).willReturn(metrics.getStandardDeviation());
+                given(clientService.updateClient(eq(99999L), any(ClientUpdateRequest.class)))
+                                .willThrow(new BusinessException("Client not found"));
 
-        mockMvc.perform(get("/api/v1/clients/metrics"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.averageAge").value(10.0))
-                .andExpect(jsonPath("$.standardDeviation").value(2.5));
-    }
+                mockMvc.perform(put("/api/v1/clients/99999")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(updateRequest)))
+                                .andExpect(status().isUnprocessableEntity());
+        }
+
+        @Test
+        void deleteClient_withAnyId_returnsNoContent() throws Exception {
+                mockMvc.perform(delete("/api/v1/clients/1"))
+                                .andExpect(status().isNoContent());
+        }
+
+        @Test
+        void getMetrics_returnsMetricsData() throws Exception {
+                MetricsResponse metrics = new MetricsResponse(10.0, 2.5);
+                given(clientService.calculateAverageAge()).willReturn(metrics.getAverageAge());
+                given(clientService.calculateStandardDeviation()).willReturn(metrics.getStandardDeviation());
+
+                mockMvc.perform(get("/api/v1/clients/metrics"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.averageAge").value(10.0))
+                                .andExpect(jsonPath("$.standardDeviation").value(2.5));
+        }
 }
